@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 import requests
 import json
 from django.conf import settings
+import csv
 
 # Create your views here.
 def list_customers(request):
@@ -90,3 +91,38 @@ def list_orders(request):
         'data': data
     }
     return render(request, template, context)
+
+def export_customers(request):
+    '''
+    This view takes an ajax request and exports customers to csv
+    '''
+    query="""query {
+    customers(first: 50) {
+        edges {
+        node {
+            id
+            firstName
+            lastName
+            email
+            ordersCount
+            tags
+        }
+        }
+    }
+    }"""
+
+    url = 'https://{}:{}@shoptrade-labs.myshopify.com/admin/api/2020-10/graphql.json'.format(settings.API_KEY, settings.API_PASS)
+
+    api_response = requests.post(url, json={'query': query})
+
+    rows = json.loads(api_response.text)['data']['customers']['edges']
+
+    response = HttpResponse()
+    response['Content-Disposition'] = 'attachment; filename=Customers.csv'
+
+    writer = csv.writer(response)
+    writer.writerow(['First Name', 'Last Name', 'Email Address'])
+    for row in rows:
+        writer.writerow([row['node']['firstName'],row['node']['lastName'], row['node']['email']])
+
+    return response
