@@ -61,4 +61,32 @@ def update_customer(request):
     }
     response = requests.put(url, json=payload, headers = {"Accept": "application/json", "Content-Type": "application/json"})
     print(response.text)
-    return HttpResponse(response.status_code);
+    return HttpResponse(response.status_code)
+
+def list_orders(request):
+    '''
+    This view lists top 50 orders with status placed in 2020
+    '''
+
+    query="""
+    query { orders(first: 50, query: "created_at:>2020-01-01") {
+        edges {
+        node {
+            id
+            name
+            createdAt
+            email
+            subtotalPrice
+        }
+        }
+    }
+    }"""
+
+    url = 'https://{}:{}@shoptrade-labs.myshopify.com/admin/api/2020-10/graphql.json'.format(settings.API_KEY, settings.API_PASS)
+    response = requests.post(url, json={'query': query})
+    data = json.loads(response.text.replace(':null,', ':"",'))['data']['orders']['edges']
+    template = 'orders.html'
+    context = {
+        'data': data
+    }
+    return render(request, template, context)

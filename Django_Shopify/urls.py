@@ -19,4 +19,5 @@ from app1 import views as app1_views
 urlpatterns = [
     path('customers/', app1_views.list_customers),
     path('update_customer/', app1_views.update_customer),
+    path('orders/', app1_views.list_orders)
 ]

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Orders
+{% endblock %}
+
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        $("#dt").DataTable();
+    });
+</script>
+{% endblock %}
+
+{% block container %}
+<h3>Orders placed in 2020</h3>
+    <table id="dt" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <th>
+                <tr>
+                    <th>Order Name</th>
+                    <th>Customer Email</th>
+                    <th>Placed on</th>
+                    <th>Total price</th>
+                </tr>
+            </th>
+        </thead>
+        <tbody id="table_body">
+            {% for row in data %}
+                <tr>
+                    <td>{{row.node.name}}</td>
+                    <td>{{row.node.email}}</td>
+                    <td>{{row.node.createdAt}}</td>
+                    <td>{{row.node.subtotalPrice}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

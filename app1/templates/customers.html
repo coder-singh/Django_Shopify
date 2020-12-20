@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+{% extends 'base.html' %}
+
+{% block title %}
+Customers
+{% endblock %}
+
+
+{% block script %}
     <script>
-        function update_customer(data){
-            data = data.split(',');
-            $('#modal_user_id').val(data[0].slice(data[0].lastIndexOf('/')+1));
-            $('#modal_first_name').val(data[1]);
-            $('#modal_last_name').val(data[2]);
-            $('#modal_email').val(data[3]);
-            $('#modal_tags').val([... data.slice(4,)])
+        function update_customer(user_id, fname, lname, email, tags){
+            console.log(user_id);
+            $('#modal_user_id').val(user_id.slice(user_id.lastIndexOf('/')+1));
+            $('#modal_first_name').val(fname);
+            $('#modal_last_name').val(lname);
+            $('#modal_email').val(email);
+            $('#modal_tags').val([... tags])
         }
         function save_user_data(){
             $.ajax({
@@ -41,21 +37,13 @@
                 }
             });
         }
-        let data = {{data | safe }};
         $(document).ready(function(){
-        $.each(data, function(index, element){
-            $('#table_body').append('<tr>'+
-                                '<td>'+element.node.firstName+' '+element.node.lastName+'</td>'+
-                                '<td>'+element.node.email+'</td>'+
-                                '<td>'+element.node.ordersCount+'</td>'+
-                                '<td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="update_customer(\''+[element.node.id,element.node.firstName,element.node.lastName,element.node.email, element.node.tags]+'\')">Update Customer</button></td>'+
-                            '</tr>');
-        });
-        $('#dt').DataTable();
+            $('#dt').DataTable();
         });
     </script>
-</head>
-<body>
+{% endblock %}
+
+{% block container %}
     <table id="dt" class="table table-striped table-bordered" style="width:100%">
         <thead>
             <th>
@@ -68,7 +56,15 @@
             </th>
         </thead>
         <tbody id="table_body">
-
+        {% for row in data %}
+            <tr>
+                <td>{{row.node.firstName}} {{row.node.lastName}}</td>
+                <td>{{row.node.email}}</td>
+                <td>{{row.node.ordersCount}}</td>
+                <td><button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal" 
+                onclick="update_customer('{{row.node.id|safe}}','{{row.node.firstName|safe}}','{{row.node.lastName|safe}}','{{row.node.email|safe}}',{{row.node.tags|safe}})">Update Customer</button></td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 
@@ -90,5 +86,4 @@
       
         </div>
       </div>
-</body>
-</html>
+{% endblock %}
